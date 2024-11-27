@@ -6,13 +6,18 @@ services:
     container_name: grafana
     ports:
       - "3000:3000"
+    environment:
+      - GF_PATHS_DATA=/var/lib/grafana
+      - GF_PATHS_LOGS=/var/log/grafana
+      - GF_PATHS_PLUGINS=/var/lib/grafana/plugins
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - ./grafana_data:/var/lib/grafana
-    command: >
-      sh -c "
-      chown -R 472:472 /var/lib/grafana &&
-      chmod -R 755 /var/lib/grafana &&
-      /run.sh"
+    user: "1000:1000"
+    command:
+     - chown -R 472:472 /var/lib/grafana
+     - chmod -R 755 /var/lib/grafana
     restart: unless-stopped
 
   keycloak:
@@ -26,9 +31,6 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     volumes:
       - ./keycloak_data:/opt/keycloak/data
-    command: >
-      sh -c "
-      chown -R 1000:1000 /opt/keycloak/data &&
-      chmod -R 755 /opt/keycloak/data &&
-      /opt/keycloak/bin/kc.sh start-dev"
+    command:
+      - start-dev
     restart: unless-stopped
