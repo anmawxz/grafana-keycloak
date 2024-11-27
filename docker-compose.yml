@@ -1,13 +1,18 @@
-version: '3.8'
+version: "3.8"
 
 services:
   grafana:
-    image: grafana/grafana-oss:latest
+    image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"
     volumes:
       - ./grafana_data:/var/lib/grafana
+    command: >
+      sh -c "
+      chown -R 472:472 /var/lib/grafana &&
+      chmod -R 755 /var/lib/grafana &&
+      /run.sh"
     restart: unless-stopped
 
   keycloak:
@@ -19,8 +24,11 @@ services:
       KC_HOSTNAME_STRICT_HTTPS: false
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-    command:
-      - start-dev
     volumes:
       - ./keycloak_data:/opt/keycloak/data
+    command: >
+      sh -c "
+      chown -R 1000:1000 /opt/keycloak/data &&
+      chmod -R 755 /opt/keycloak/data &&
+      /opt/keycloak/bin/kc.sh start-dev"
     restart: unless-stopped
